@@ -23,6 +23,10 @@ public class StandSwat : MonoBehaviour {
 	GameObject hips;
 	Vector3 midPoint;
 
+	//Boolean Variables to Check witch Leg should step
+	bool stepLeft;
+	bool stepRight;
+
 	// Use this for initialization
 	void Start () {
 		rb = GetComponent<Rigidbody>();
@@ -32,6 +36,8 @@ public class StandSwat : MonoBehaviour {
 		rightFoot = GameObject.Find("/swat/Hips/RightUpLeg/RightLeg");
 		hips = GameObject.Find("/swat/Hips");
 
+		stepLeft = false;
+		stepRight = false;
 
 		InitPD ();
 	}
@@ -54,17 +60,15 @@ public class StandSwat : MonoBehaviour {
 
 		// Update within the line of movement
 		float rotationOnY = hips.transform.rotation.eulerAngles.y;
-		//print ("Rotation: " + hips.transform.rotation.eulerAngles);
-		//midPoint = CalculateFootAlignment(rotationOnY);
 
 		// Ensure that the puppet walks in a straigh line
 		if (force == 0)
 			//midPoint = (rightFoot.transform.position + leftFoot.transform.position) / 2;
 			midPoint = midPoint;
 		else
-			//midPoint = new Vector3 (midPoint.x, midPoint.y, (rightFoot.transform.position.z + leftFoot.transform.position.z) / 2);
-			midPoint = midPoint;
-		print ("Midpoint: " + midPoint);
+			midPoint = new Vector3 (midPoint.x, midPoint.y, (rightFoot.transform.position.z + leftFoot.transform.position.z) / 2);
+			//midPoint = midPoint;
+		//print ("Midpoint: " + midPoint);
 
 		// Calculate Errors
 		standError = standingPosition - transform.position;
@@ -78,26 +82,22 @@ public class StandSwat : MonoBehaviour {
 		//Vector3 forceUpdate = new Vector3 (kpX * alignError.x ,standError.y * kpY, kpZ * alignError.z);
 		force *= walkingSpeed;
 		//print ("Force: " + force);
-		Vector3 forceUpdate = new Vector3 (kpX * alignError.x + kdX * eDotX, standError.y * kpY, kpZ * alignError.z + kdZ * eDotZ + force);
+		//Vector3 forceUpdate = new Vector3 (kpX * alignError.x + kdX * eDotX, standError.y * kpY, kpZ * alignError.z + kdZ * eDotZ + force);
+		Vector3 forceUpdate = new Vector3 (kpX * alignError.x + kdX * eDotX, standError.y * kpY, kpZ * alignError.z + kdZ * eDotZ);
 		ePrevX = alignError.x;
 		ePrevZ = alignError.z;
 		rb.AddForce (forceUpdate);
+		//printFeetPosition();
+	}	
+
+	// Function to know when the leg is in the correct angle
+
+	void rightLegUpCheck(){
+		//midPoint = (rightFoot.transform.position + leftFoot.transform.position) / 2;
 	}
 
-	// Implement something to lock the puppet allignment
-	Vector3 CalculateFootAlignment(float hipsRot){
-		Vector3 rawAllignment = (rightFoot.transform.position + leftFoot.transform.position)/2;
-
-		float x = (rawAllignment.x - midPointPrev.x) * Mathf.Cos (hipsRot);
-		float y = rawAllignment.y - midPointPrev.y;
-		float z = (rawAllignment.z - midPointPrev.z) * Mathf.Sin (hipsRot);
-
-		print ("X: " + Mathf.Cos (hipsRot));
-		print ("Z: " + Mathf.Sin (hipsRot));
-		Vector3 update = new Vector3 (midPointPrev.x + x, midPointPrev.y + y, midPointPrev.z + z);
-
-		midPointPrev = rawAllignment;
-		return update;
-		//return rawAllignment;
+	void printFeetPosition(){
+		print ("Right foot: " + rightFoot.transform.position);
+		print ("Left foot: " + leftFoot.transform.position);
 	}
 }
