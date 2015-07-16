@@ -23,10 +23,6 @@ public class StandSwat : MonoBehaviour {
 	GameObject hips;
 	Vector3 midPoint;
 
-	//Boolean Variables to Check witch Leg should step
-	bool stepLeft;
-	bool stepRight;
-
 	// Use this for initialization
 	void Start () {
 		rb = GetComponent<Rigidbody>();
@@ -35,9 +31,6 @@ public class StandSwat : MonoBehaviour {
 		leftFoot = GameObject.Find("/swat/Hips/LeftUpLeg/LeftLeg");
 		rightFoot = GameObject.Find("/swat/Hips/RightUpLeg/RightLeg");
 		hips = GameObject.Find("/swat/Hips");
-
-		stepLeft = false;
-		stepRight = false;
 
 		InitPD ();
 	}
@@ -56,13 +49,9 @@ public class StandSwat : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		float force = Input.GetAxisRaw ("Vertical");
+		//print ("State from STAND: " + StateMachine.state);
 
-		// Update within the line of movement
-		float rotationOnY = hips.transform.rotation.eulerAngles.y;
-
-		// Ensure that the puppet walks in a straigh line
-		if (force == 0)
+		if (StateMachine.state == Walk.STAND)
 			//midPoint = (rightFoot.transform.position + leftFoot.transform.position) / 2;
 			midPoint = midPoint;
 		else
@@ -80,7 +69,7 @@ public class StandSwat : MonoBehaviour {
 
 		// P control on the Axes
 		//Vector3 forceUpdate = new Vector3 (kpX * alignError.x ,standError.y * kpY, kpZ * alignError.z);
-		force *= walkingSpeed;
+		//force *= walkingSpeed;
 		//print ("Force: " + force);
 		//Vector3 forceUpdate = new Vector3 (kpX * alignError.x + kdX * eDotX, standError.y * kpY, kpZ * alignError.z + kdZ * eDotZ + force);
 		Vector3 forceUpdate = new Vector3 (kpX * alignError.x + kdX * eDotX, standError.y * kpY, kpZ * alignError.z + kdZ * eDotZ);

@@ -3,30 +3,23 @@ using System.Collections;
 
 public class LeftMidLeg : MonoBehaviour {
 
-	Rigidbody midLeftLegRB;
-	GameObject leftFoot;
-
-	Vector3 lockFootPos;
+	Rigidbody midLeftLeg;
+	Vector3 lockPosition;
 
 	// Use this for initialization
 	void Start () {
 
-		midLeftLegRB = GetComponent<Rigidbody>();
-		lockFootPos= midLeftLegRB.transform.position;
-
-		leftFoot = GameObject.Find("/swat/Hips/LeftUpLeg/LeftLeg/LeftFoot");
-		//lockFootPos = leftFoot.transform.position;
+		midLeftLeg = GetComponent<Rigidbody>();
+		lockPosition = midLeftLeg.transform.position;
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		float force = Input.GetAxisRaw ("Vertical");
-		
-		if (force != 0) {
+		if (StateMachine.state == Walk.RIGHT_STEP_UP_LEG || StateMachine.state == Walk.RIGHT_STEP_MID_LEG) {
 			//leftFoot.transform.position = lockFootPos;
-			midLeftLegRB.transform.position = lockFootPos;
+			midLeftLeg.transform.position = lockPosition;
 		} else {
-			lockFootPos= midLeftLegRB.transform.position;
+			lockPosition = midLeftLeg.transform.position;
 		}
 	}
 }

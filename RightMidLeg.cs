@@ -3,39 +3,34 @@ using System.Collections;
 
 public class RightMidLeg : MonoBehaviour {
 
-	Rigidbody midRightLegRB;
-	Rigidbody leftFootRB;
-	Rigidbody leftMidLegRB;
-	
-	GameObject leftFoot;
-	GameObject leftMidLeg;
-	GameObject hips;
-	GameObject rightFoot;
+	Rigidbody rightMidLeg;
 
-	//Variable to know if the foot is ahead or behind
-	bool isAhead;
+	GameObject ragdoll;
 
 	// Use this for initialization
 	void Start () {
-		// MOVING right leg
-		midRightLegRB = GetComponent<Rigidbody>();
-		rightFoot = GameObject.Find("/swat/Hips/RightUpLeg/RightLeg");
-
-
-		// STEADY left leg
-		leftFoot = GameObject.Find("/swat/Hips/LeftUpLeg/LeftLeg/LeftFoot");
-		leftFootRB = leftFoot.GetComponent<Rigidbody>();
-		leftMidLeg = GameObject.Find("/swat/Hips/LeftUpLeg/LeftLeg");
-		leftMidLegRB = leftMidLeg.GetComponent<Rigidbody>();
-
-		// Reference for the hips
-		hips = GameObject.Find("/swat/Hips");
-
-		//Foot doesnt start ahead
-		isAhead = false;
+		rightMidLeg = GetComponent<Rigidbody>();
+		ragdoll = GameObject.Find("/swat");
 	}
-	
+
 	// Update is called once per frame
+	void FixedUpdate () {
+		//print (StateMachine.state);
+		if (StateMachine.state == Walk.RIGHT_STEP_UP_LEG) {
+			rightMidLeg.AddForce (rightMidLeg.transform.forward * -10);
+		}
+		if (StateMachine.state == Walk.RIGHT_STEP_MID_LEG) {
+			rightMidLeg.isKinematic = true;
+			rightMidLeg.isKinematic = false;
+			ragdoll.SendMessage("rightMidLegOnPosition");
+
+		}
+	}
+
+
+	// BACKUP
+
+	/*// Update is called once per frame
 	void FixedUpdate () {
 		float force = Input.GetAxisRaw ("Vertical");
 		
@@ -57,5 +52,5 @@ public class RightMidLeg : MonoBehaviour {
 				isAhead = true;
 			}
 		} 
-	}
+	}*/
 }
