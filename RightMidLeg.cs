@@ -23,7 +23,6 @@ public class RightMidLeg : MonoBehaviour {
 			rightMidLeg.isKinematic = true;
 			rightMidLeg.isKinematic = false;
 			ragdoll.SendMessage("rightMidLegOnPosition");
-
 		}
 	}
 

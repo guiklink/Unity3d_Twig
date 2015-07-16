@@ -27,6 +27,9 @@ public class RightUpLeg : MonoBehaviour {
 		if(StateMachine.state == Walk.RIGHT_STEP_MID_LEG){
 			toAngle();	
 		}
+		if(StateMachine.state == Walk.RIGHT_LEG_DOWN){
+			toAngle();	
+		}
 	}
 
 	void toAngle(){

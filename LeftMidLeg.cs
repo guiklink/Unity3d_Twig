@@ -15,7 +15,7 @@ public class LeftMidLeg : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		if (StateMachine.state == Walk.RIGHT_STEP_UP_LEG || StateMachine.state == Walk.RIGHT_STEP_MID_LEG) {
+		if (StateMachine.state == Walk.RIGHT_STEP_UP_LEG || StateMachine.state == Walk.RIGHT_STEP_MID_LEG || StateMachine.state == Walk.RIGHT_LEG_DOWN) {
 			//leftFoot.transform.position = lockFootPos;
 			midLeftLeg.transform.position = lockPosition;
 		} else {

@@ -12,9 +12,10 @@ public class StandSwat : MonoBehaviour {
 	float ePrevZ = 0;
 	public float walkingSpeed = 1000f;
 
-	Vector3 standError;
+	float standError;
 	Vector3 alignError;
 	Vector3 standingPosition;
+	float balancingHeight;
 	Rigidbody rb;
 	Vector3 midPointPrev;
 
@@ -37,10 +38,11 @@ public class StandSwat : MonoBehaviour {
 
 	void InitPD()
 	{
-		standError = new Vector3(0,0,0);
+		standError = 0f;
 
 		// Use this variable to store the Y reference of standing
 		standingPosition = transform.position;
+		balancingHeight = standingPosition.y;
 
 		//This must be removed once the doll starts moving
 		midPoint = (rightFoot.transform.position + leftFoot.transform.position) / 2;
@@ -59,30 +61,34 @@ public class StandSwat : MonoBehaviour {
 			//midPoint = midPoint;
 		//print ("Midpoint: " + midPoint);
 
-		// Calculate Errors
-		standError = standingPosition - transform.position;
-		alignError = midPoint - transform.position;
+		if (StateMachine.state == Walk.RIGHT_LEG_DOWN) {
+			standPID (balancingHeight);
+			balancingHeight -= 0.001f;
+		} else {
+			standPID (standingPosition.y);
+		}
+	}	
+	
+	// PID Loop Function
 
+	void standPID(float heightReference){
+		// Calculate Errors
+		standError = heightReference - transform.position.y;
+		alignError = midPoint - transform.position;
+		
 		// Calculate Edot 
 		float eDotX = alignError.x - ePrevX;
 		float eDotZ = alignError.z - ePrevZ;
-
+		
 		// P control on the Axes
 		//Vector3 forceUpdate = new Vector3 (kpX * alignError.x ,standError.y * kpY, kpZ * alignError.z);
 		//force *= walkingSpeed;
 		//print ("Force: " + force);
 		//Vector3 forceUpdate = new Vector3 (kpX * alignError.x + kdX * eDotX, standError.y * kpY, kpZ * alignError.z + kdZ * eDotZ + force);
-		Vector3 forceUpdate = new Vector3 (kpX * alignError.x + kdX * eDotX, standError.y * kpY, kpZ * alignError.z + kdZ * eDotZ);
+		Vector3 forceUpdate = new Vector3 (kpX * alignError.x + kdX * eDotX, standError * kpY, kpZ * alignError.z + kdZ * eDotZ);
 		ePrevX = alignError.x;
 		ePrevZ = alignError.z;
 		rb.AddForce (forceUpdate);
-		//printFeetPosition();
-	}	
-
-	// Function to know when the leg is in the correct angle
-
-	void rightLegUpCheck(){
-		//midPoint = (rightFoot.transform.position + leftFoot.transform.position) / 2;
 	}
 
 	void printFeetPosition(){
