@@ -1,8 +1,11 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class StandSwat : MonoBehaviour {
-	
+
+	// Height the doll should crouch before walking
+	public static float walkingHeight = 0.9f;
+
 	public float kpX = 100f;
 	public float kdX = 100f;
 	float ePrevX = 0;
@@ -22,6 +25,7 @@ public class StandSwat : MonoBehaviour {
 	GameObject leftFoot;
 	GameObject rightFoot;
 	GameObject hips;
+	GameObject ragdoll;
 	Vector3 midPoint;
 
 	// Use this for initialization
@@ -29,9 +33,10 @@ public class StandSwat : MonoBehaviour {
 		rb = GetComponent<Rigidbody>();
 
 		// Store Position of the relevant body parts (this must be made generic eventually)
-		leftFoot = GameObject.Find("/swat/Hips/LeftUpLeg/LeftLeg");
-		rightFoot = GameObject.Find("/swat/Hips/RightUpLeg/RightLeg");
+		leftFoot = GameObject.Find("/swat/Hips/LeftUpLeg/LeftLeg/LeftFoot");
+		rightFoot = GameObject.Find("/swat/Hips/RightUpLeg/RightLeg/RightFoot");
 		hips = GameObject.Find("/swat/Hips");
+		ragdoll = GameObject.Find("/swat");
 
 		InitPD ();
 	}
@@ -42,6 +47,8 @@ public class StandSwat : MonoBehaviour {
 
 		// Use this variable to store the Y reference of standing
 		standingPosition = transform.position;
+
+		// THIS VARIABLE NEEDS TO BE ACCOUNTED FOR CASES THAT THE DOLL DOESNT START IN Y = 0
 		balancingHeight = standingPosition.y;
 
 		//This must be removed once the doll starts moving
@@ -51,30 +58,38 @@ public class StandSwat : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		//print ("State from STAND: " + StateMachine.state);
+		//print (balancingHeight);
 
-		if (StateMachine.state == Walk.STAND)
-			//midPoint = (rightFoot.transform.position + leftFoot.transform.position) / 2;
+		// The mid point controls the X-axis and Z-axis of the ragdoll alligned according to its feet
+		if (StateMachine_Twick.state == WalkState.STAND)
 			midPoint = midPoint;
-		else
-			midPoint = new Vector3 (midPoint.x, midPoint.y, (rightFoot.transform.position.z + leftFoot.transform.position.z) / 2);
-			//midPoint = midPoint;
-		//print ("Midpoint: " + midPoint);
+		else if (StateMachine_Twick.state == WalkState.CROUCH_TO_WALK) {
+			balancingHeight -= 0.003f;
 
-		if (StateMachine.state == Walk.RIGHT_LEG_DOWN) {
-			standPID (balancingHeight);
-			balancingHeight -= 0.001f;
-		} else {
-			standPID (standingPosition.y);
+			if (balancingHeight <= walkingHeight)
+				ragdoll.SendMessage ("crouchedToStep");
+		} else if (StateMachine_Twick.state == WalkState.HIPS_STEP_HEIGHT) {
+			if (shouldRightLegStep ())
+				ragdoll.SendMessage ("calculateRightStep");
+			else
+				ragdoll.SendMessage ("calculateLeftStep");
+		} else if (StateMachine_Twick.state == WalkState.LEFT_STEP || StateMachine_Twick.state == WalkState.RIGHT_STEP) {
+			midPoint = new Vector3 (midPoint.x, midPoint.y, (rightFoot.transform.position.z + leftFoot.transform.position.z) / 2);
 		}
+		//else
+		//	midPoint = new Vector3 (midPoint.x, midPoint.y, (rightFoot.transform.position.z + leftFoot.transform.position.z) / 2);
+		// The Y-axis of the ragdoll is controlled here
+		standPID (midPoint.x, balancingHeight, midPoint.z);
 	}	
 	
-	// PID Loop Function
+	// PID Loop Function get the coordinates that the body will be maintained
 
-	void standPID(float heightReference){
+	void standPID(float x_reference, float y_reference, float z_Reference){
 		// Calculate Errors
-		standError = heightReference - transform.position.y;
-		alignError = midPoint - transform.position;
+		standError = y_reference - transform.position.y;
+
+		Vector3 x_z_reference = new Vector3 (x_reference, 0, z_Reference);
+		alignError = x_z_reference - transform.position;
 		
 		// Calculate Edot 
 		float eDotX = alignError.x - ePrevX;
@@ -84,11 +99,24 @@ public class StandSwat : MonoBehaviour {
 		//Vector3 forceUpdate = new Vector3 (kpX * alignError.x ,standError.y * kpY, kpZ * alignError.z);
 		//force *= walkingSpeed;
 		//print ("Force: " + force);
-		//Vector3 forceUpdate = new Vector3 (kpX * alignError.x + kdX * eDotX, standError.y * kpY, kpZ * alignError.z + kdZ * eDotZ + force);
+		//if(force != null)
+		//Vector3 forceUpdate = new Vector3 (kpX * alignError.x + kdX * eDotX, standError * kpY, kpZ * alignError.z + kdZ * eDotZ + force);
+		//else
 		Vector3 forceUpdate = new Vector3 (kpX * alignError.x + kdX * eDotX, standError * kpY, kpZ * alignError.z + kdZ * eDotZ);
 		ePrevX = alignError.x;
 		ePrevZ = alignError.z;
 		rb.AddForce (forceUpdate);
+	}
+
+	// Function returns true if right leg should give the next step and false if left leg should step
+	bool shouldRightLegStep(){
+		Vector3 leftFootCoordInHipCoord = rb.transform.localToWorldMatrix.MultiplyPoint (leftFoot.transform.position);
+		Vector3 rightFootCoordInHipCoord = rb.transform.localToWorldMatrix.MultiplyPoint (rightFoot.transform.position);
+
+		if (rightFootCoordInHipCoord.z >= leftFootCoordInHipCoord.z)
+			return true;
+		else
+			return false;
 	}
 
 	void printFeetPosition(){

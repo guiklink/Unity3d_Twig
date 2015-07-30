@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public enum Walk : short {STAND ,RIGHT_STEP_UP_LEG, RIGHT_STEP_MID_LEG, RIGHT_LEG_DOWN};
+public enum Walk : short {STAND ,RIGHT_STEP_UP_LEG, RIGHT_STEP_MID_LEG, RIGHT_LEG_DOWN, RIGHT_STAND};
 
 public class StateMachine : MonoBehaviour {
 	
@@ -26,10 +26,17 @@ public class StateMachine : MonoBehaviour {
 	}
 
 	void righUpLegLiftedFront(){
+		print ("changing to RIGHT_STEP_MID_LEG...");
 		state = Walk.RIGHT_STEP_MID_LEG;
 	}
 
 	void rightMidLegOnPosition(){
+		print ("changing to RIGHT_LEG_DOWN...");
 		state = Walk.RIGHT_LEG_DOWN;
+	}
+
+	void standOnRightLeg(){
+		print ("changing to RIGHT_STAND...");
+		state = Walk.RIGHT_STAND;
 	}
 }

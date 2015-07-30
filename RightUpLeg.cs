@@ -33,6 +33,6 @@ public class RightUpLeg : MonoBehaviour {
 	}
 
 	void toAngle(){
-		rightUpLeg.AddTorque (rightUpLeg.transform.right * -150);
+		rightUpLeg.AddTorque (rightUpLeg.transform.right * -350);
 	}
 }

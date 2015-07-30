@@ -7,22 +7,38 @@ public class RightMidLeg : MonoBehaviour {
 
 	GameObject ragdoll;
 
+	Vector3 lockPosition;
+	Transform standingBackup;
+
 	// Use this for initialization
 	void Start () {
 		rightMidLeg = GetComponent<Rigidbody>();
 		ragdoll = GameObject.Find("/swat");
+
+		standingBackup = rightMidLeg.transform;
 	}
 
 	// Update is called once per frame
 	void FixedUpdate () {
 		//print (StateMachine.state);
 		if (StateMachine.state == Walk.RIGHT_STEP_UP_LEG) {
-			rightMidLeg.AddForce (rightMidLeg.transform.forward * -10);
+			rightMidLeg.AddForce (rightMidLeg.transform.forward * 0);
 		}
 		if (StateMachine.state == Walk.RIGHT_STEP_MID_LEG) {
 			rightMidLeg.isKinematic = true;
 			rightMidLeg.isKinematic = false;
 			ragdoll.SendMessage("rightMidLegOnPosition");
+		}
+		if (StateMachine.state == Walk.RIGHT_LEG_DOWN) {
+			rightMidLeg.AddForce (rightMidLeg.transform.up * -10);
+		}
+		if (StateMachine.state == Walk.RIGHT_STAND) {
+			rightMidLeg.transform.localPosition = lockPosition;
+			rightMidLeg.transform.rotation = standingBackup.rotation;
+		}
+
+		if (StateMachine.state != Walk.RIGHT_STAND) {
+			lockPosition = rightMidLeg.transform.localPosition;
 		}
 	}
 
