@@ -15,13 +15,13 @@ public class LeftUpLeg : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		//print ("RightUpLeg Euler Angle: " + (360 - leftUpLeg.transform.eulerAngles.x));
-		if (StateMachine.state == Walk.RIGHT_STAND) {
-			toBackAngle();
+		if (StateMachine_Twick.state == WalkState.LEFT_CROUCH || StateMachine_Twick.state == WalkState.LEFT_STEP) {
+			step();
 		}
 	}
 	
-	void toBackAngle(){
-		leftUpLeg.AddForce (leftUpLeg.transform.forward * -100);
+	void step(){
+		//leftUpLeg.AddTorque (leftUpLeg.transform.right * -500);
+		//leftUpLeg.AddForce (leftUpLeg.transform.up * 500);
 	}
 }

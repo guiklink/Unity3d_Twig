@@ -63,22 +63,29 @@ public class StandSwat : MonoBehaviour {
 		// The mid point controls the X-axis and Z-axis of the ragdoll alligned according to its feet
 		if (StateMachine_Twick.state == WalkState.STAND)
 			midPoint = midPoint;
-		else if (StateMachine_Twick.state == WalkState.CROUCH_TO_WALK) {
-			balancingHeight -= 0.003f;
 
-			if (balancingHeight <= walkingHeight)
-				ragdoll.SendMessage ("crouchedToStep");
-		} else if (StateMachine_Twick.state == WalkState.HIPS_STEP_HEIGHT) {
-			if (shouldRightLegStep ())
-				ragdoll.SendMessage ("calculateRightStep");
-			else
-				ragdoll.SendMessage ("calculateLeftStep");
-		} else if (StateMachine_Twick.state == WalkState.LEFT_STEP || StateMachine_Twick.state == WalkState.RIGHT_STEP) {
-			midPoint = new Vector3 (midPoint.x, midPoint.y, (rightFoot.transform.position.z + leftFoot.transform.position.z) / 2);
+		else if (StateMachine_Twick.state == WalkState.PICK_LEG){
+			//if(shouldRightLegStep)
+			//	ragdoll.SendMessage("rightCrouch");
+			//else
+			ragdoll.SendMessage("leftCrouch");
 		}
-		//else
-		//	midPoint = new Vector3 (midPoint.x, midPoint.y, (rightFoot.transform.position.z + leftFoot.transform.position.z) / 2);
-		// The Y-axis of the ragdoll is controlled here
+
+		else if (StateMachine_Twick.state == WalkState.LEFT_CROUCH) {
+			balancingHeight -= 0.003f;
+			if (balancingHeight <= walkingHeight)
+				ragdoll.SendMessage ("leftStep");
+		}
+
+		else if (StateMachine_Twick.state == WalkState.RIGHT_CROUCH) {
+			balancingHeight -= 0.003f;
+			if (balancingHeight <= walkingHeight)
+				ragdoll.SendMessage ("rightStep");
+		} 
+
+		if (StateMachine_Twick.state != WalkState.STAND)
+			midPoint = new Vector3 (midPoint.x, midPoint.y, (rightFoot.transform.position.z + leftFoot.transform.position.z) / 2);
+
 		standPID (midPoint.x, balancingHeight, midPoint.z);
 	}	
 	

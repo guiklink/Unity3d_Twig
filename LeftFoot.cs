@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 public class LeftFoot : MonoBehaviour {
 
-	float stepSpeed_x = 0.5f;
-	float stepSpeed_y = 0.5f;
-	float stepSpeed_z = 0.5f;
+	float stepSpeed_x = 0.05f;
+	float stepSpeed_y = 0.05f;
+	float stepSpeed_z = 0.05f;
 
 	Rigidbody leftFoot;
 	Vector3 lockPosition;
@@ -35,73 +35,53 @@ public class LeftFoot : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		//print (distanceFootToHip);
-		
-		if (StateMachine_Twick.state == WalkState.RIGHT_STEP || StateMachine_Twick.state == WalkState.CALCULATE_RIGHT_STEP)
-			leftFoot.transform.position = lockPosition;
-		else if (StateMachine_Twick.state == WalkState.CALCULATE_LEFT_STEP) {
-			//print("Current left foot pos: " + leftFoot.transform.position);
-			//print("Left foot position to update: " + calculateFootTrajectory());
-			footTraj = calculateFootTrajectory ();
-			ragdoll.SendMessage ("leftStep");
+		if (StateMachine_Twick.state == WalkState.LEFT_CROUCH) {
+			footTraj = calculateDesiredPosition();
 		} else if (StateMachine_Twick.state == WalkState.LEFT_STEP) {
 			leftFoot.isKinematic = true;
-			if(moveFoot(footTraj))
-				print("In position.");
-		}
-		else
+			if(moveUntilDesired(footTraj)){
+				leftFoot.isKinematic = false;
+				ragdoll.SendMessage("rightCrouch");
+			}
+		} else if(StateMachine_Twick.state == WalkState.RIGHT_CROUCH || StateMachine_Twick.state == WalkState.RIGHT_STEP){
+			leftFoot.transform.position.Set(lockPosition.x, leftFoot.position.y, lockPosition.z);
+			leftFoot.MoveRotation(new Quaternion(0, 0, 0, 1));
+		} else if(StateMachine_Twick.state != WalkState.RIGHT_CROUCH && StateMachine_Twick.state != WalkState.RIGHT_STEP){
 			lockPosition = leftFoot.transform.position;
+		}
 	}
 
-	// Returned stored positions for feet trajectories in world coordinates
-	Vector3 calculateFootTrajectory(){
+	// Calculate desired position in world-coordinates
+	Vector3 calculateDesiredPosition(){
+		Vector3 calculatePos = new Vector3 (calculateFootDisplacement_X(), calculateFootDisplacement_Y(), calculateFootDisplacement_Z());
+		calculatePos = leftFoot.transform.localToWorldMatrix.MultiplyPoint (calculatePos);
+		return calculatePos;
+	}
+
+	// Returne X position
+	float calculateFootDisplacement_X(){
+		return 0f;
+	}
+
+	// Returne Y position
+	float calculateFootDisplacement_Y(){
+		return 0.2f;
+	}
+
+	// Returne Z position
+	float calculateFootDisplacement_Z(){
 		float h = StandSwat.walkingHeight;
 		float H = distanceToeBaseToHip; // Only use 90% of the distance between hip and foot
-		//print ("H = " + H);
-		//print ("h = " + h);
 		float legDisplacementInZ = Mathf.Sqrt (Mathf.Pow(H,2) - Mathf.Pow(h,2));
-		//print ("Leg displacement: " + legDisplacementInZ);
-
-		Vector3 newPosition = leftFoot.transform.localToWorldMatrix.MultiplyPoint (new Vector3(0, 0, legDisplacementInZ));
-		return newPosition;
+		return legDisplacementInZ;
 	}
 
-	// Move foot at internal clock rate (give the desired world coordinates)
-	bool moveFoot(Vector3 desiredPos){
-		print ("---------------------------------------------------------------------------------");
-		print("Left foot position ( X: " + leftFoot.transform.position.x + " | Y: " + leftFoot.transform.position.y + " | Z: " + leftFoot.transform.position.z + " )");
-		print("DESIRED Left foot position ( X: " + desiredPos.x + " | Y: " + desiredPos.y + " | Z: " + desiredPos.z + " )");
-		if (leftFoot.transform.position.x == desiredPos.x && leftFoot.transform.position.y == desiredPos.y && leftFoot.transform.position.z == desiredPos.z)
+	bool moveUntilDesired(Vector3 desiredPos){
+		if (leftFoot.transform.position.z > desiredPos.z)
 			return true;
 		else {
-			// Increment the foot position by a factor of time
-			Vector3 tmpPos = new Vector3(Time.deltaTime * stepSpeed_x, Time.deltaTime * stepSpeed_y, Time.deltaTime * stepSpeed_z);
-
-			// Converts to reference to foot coordinates to check if the position is not being overlapped
-			Vector3 desiredPosInFootCoord = leftFoot.transform.worldToLocalMatrix.MultiplyPoint(desiredPos);
-
-			print("\nTMP position ( X: " + tmpPos.x + " | Y: " + tmpPos.y + " | Z: " + tmpPos.z + " )");
-			print("DESIRED converted foot position ( X: " + desiredPosInFootCoord.x + " | Y: " + desiredPosInFootCoord.y + " | Z: " + desiredPosInFootCoord.z + " )");
-
-
-			//Make sure that the position is not overlapped
-			if(tmpPos.x > desiredPosInFootCoord.x)
-				tmpPos.x = desiredPosInFootCoord.x;
-			if(tmpPos.y > desiredPosInFootCoord.y)
-				tmpPos.y = desiredPosInFootCoord.y;
-			if(tmpPos.z > desiredPosInFootCoord.z)
-				tmpPos.z = desiredPosInFootCoord.z;
-
-			print("\nTMP CALCULATED ( X: " + tmpPos.x + " | Y: " + tmpPos.y + " | Z: " + tmpPos.z + " )");
-
-			// Trasnform to the world frame and move to it
-			tmpPos = leftFoot.transform.localToWorldMatrix.MultiplyPoint(tmpPos);
-
-			print("\nTMP UPDATE ( X: " + tmpPos.x + " | Y: " + tmpPos.y + " | Z: " + tmpPos.z + " )");
-			print ("---------------------------------------------------------------------------------");
-
-			leftFoot.MovePosition(tmpPos);
-			//leftFoot.transform.position = tmpPos;
+			leftFoot.MovePosition (transform.position + transform.forward * Time.deltaTime);
+			leftFoot.MoveRotation(new Quaternion(0, 0, 0, 1));
 			return false;
 		}
 	}
