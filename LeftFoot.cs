@@ -4,15 +4,18 @@ using System.Collections.Generic;
 
 public class LeftFoot : MonoBehaviour {
 
+	// Public variables to control the step speed
 	float stepSpeed_x = 0.05f;
 	float stepSpeed_y = 0.05f;
 	float stepSpeed_z = 0.05f;
 
+	// Foot variables
 	Rigidbody leftFoot;
 	Vector3 lockPosition;
 	float distanceFootToHip;
 	float distanceToeBaseToHip;
-	
+
+	// References for other body parts
 	GameObject hips;
 	GameObject footBase;
 	GameObject ragdoll;
@@ -27,7 +30,8 @@ public class LeftFoot : MonoBehaviour {
 		ragdoll = GameObject.Find("/swat");
 		hips = GameObject.Find("/swat/Hips");
 		footBase = GameObject.Find("/swat/Hips/LeftUpLeg/LeftLeg/LeftFoot/LeftToeBase");
-		
+
+		// Calculate distance to the hips
 		distanceFootToHip = Vector3.Distance(hips.transform.position, leftFoot.transform.position);
 		distanceToeBaseToHip = Vector3.Distance(hips.transform.position, footBase.transform.position);
 
@@ -35,20 +39,26 @@ public class LeftFoot : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
+		// STEP BLOCKS
 		if (StateMachine_Twick.state == WalkState.LEFT_CROUCH) {
 			footTraj = calculateDesiredPosition();
+
 		} else if (StateMachine_Twick.state == WalkState.LEFT_STEP) {
 			leftFoot.isKinematic = true;
 			if(moveUntilDesired(footTraj)){
 				leftFoot.isKinematic = false;
 				ragdoll.SendMessage("rightCrouch");
 			}
+		
+		// HOLD FOOT IN PLACE
 		} else if(StateMachine_Twick.state == WalkState.RIGHT_CROUCH || StateMachine_Twick.state == WalkState.RIGHT_STEP){
 			leftFoot.transform.position.Set(lockPosition.x, leftFoot.position.y, lockPosition.z);
 			leftFoot.MoveRotation(new Quaternion(0, 0, 0, 1));
+
 		} else if(StateMachine_Twick.state != WalkState.RIGHT_CROUCH && StateMachine_Twick.state != WalkState.RIGHT_STEP){
 			lockPosition = leftFoot.transform.position;
 		}
+
 	}
 
 	// Calculate desired position in world-coordinates
@@ -76,6 +86,7 @@ public class LeftFoot : MonoBehaviour {
 		return legDisplacementInZ;
 	}
 
+	// Returns TRUE when the desired position is achieved
 	bool moveUntilDesired(Vector3 desiredPos){
 		if (leftFoot.transform.position.z > desiredPos.z)
 			return true;

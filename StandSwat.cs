@@ -69,6 +69,7 @@ public class StandSwat : MonoBehaviour {
 			//	ragdoll.SendMessage("rightCrouch");
 			//else
 			ragdoll.SendMessage("leftCrouch");
+			//ragdoll.SendMessage("rightCrouch");
 		}
 
 		else if (StateMachine_Twick.state == WalkState.LEFT_CROUCH) {
