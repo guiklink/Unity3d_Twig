@@ -45,23 +45,28 @@ public class LeftFoot : MonoBehaviour {
 	void FixedUpdate () {
 		// STEP BLOCKS
 		if (StateMachine_Twick.state == WalkState.CALCULATE_LEFT_STEP) {
-			footTraj = calculateDesiredPosition();
-			ragdoll.SendMessage("leftStep");
+			footTraj = calculateDesiredPosition ();
+			ragdoll.SendMessage ("leftStep");
 
 		} else if (StateMachine_Twick.state == WalkState.LEFT_STEP) {
 			leftFoot.isKinematic = true;
-			if(moveUntilDesired(footTraj)){
+			if (moveUntilDesired (footTraj)) {
 				leftFoot.isKinematic = false;
-				ragdoll.SendMessage("rightStepCalculate");
+				ragdoll.SendMessage ("rightStepCalculate");
 			}
 		
-		// HOLD FOOT IN PLACE
-		} else if(StateMachine_Twick.state == WalkState.CALCULATE_RIGHT_STEP || StateMachine_Twick.state == WalkState.RIGHT_STEP){
-			leftFoot.transform.position.Set(lockPosition.x, leftFoot.position.y, lockPosition.z);
-			leftFoot.MoveRotation(new Quaternion(0, 0, 0, 1));
+			// HOLD FOOT IN PLACE
+		} else if (StateMachine_Twick.state == WalkState.CALCULATE_RIGHT_STEP || StateMachine_Twick.state == WalkState.RIGHT_STEP) {
+			leftFoot.transform.position.Set (lockPosition.x, leftFoot.position.y, lockPosition.z);
+			leftFoot.MoveRotation (new Quaternion (0, 0, 0, 1));
 
-		} else if(StateMachine_Twick.state != WalkState.CALCULATE_RIGHT_STEP && StateMachine_Twick.state != WalkState.RIGHT_STEP){
+		} else if (StateMachine_Twick.state != WalkState.CALCULATE_RIGHT_STEP && StateMachine_Twick.state != WalkState.RIGHT_STEP) {
 			lockPosition = leftFoot.transform.position;
+		}
+
+		// STAND POSITION
+		else if (StateMachine_Twick.state == WalkState.STAND) {
+			leftFoot.MoveRotation (new Quaternion (0, 0, 0, 1));
 		}
 
 	}
