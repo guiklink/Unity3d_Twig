@@ -72,7 +72,8 @@ public class StandSwat : MonoBehaviour {
 			//if(shouldRightLegStep)
 			//	ragdoll.SendMessage("rightCrouch");
 			//else
-			ragdoll.SendMessage("leftStepCalculate");
+			//ragdoll.SendMessage("leftStepCalculate");
+			ragdoll.SendMessage("rightStepCalculate");
 			//ragdoll.SendMessage("rightCrouch");
 		}
 

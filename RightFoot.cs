@@ -19,8 +19,9 @@ public class RightFoot : MonoBehaviour {
 	GameObject hips;
 	GameObject footBase;
 	GameObject ragdoll;
-	
-	Vector3 footTraj; // Variable to store the path of the foot during the step
+
+	Matrix4x4 matrizReference;	// Matrix reference to the hips
+	Vector3 footTraj; 			// Variable to store the path of the foot during the step
 	
 	// Use this for initialization
 	void Start () {
@@ -42,6 +43,7 @@ public class RightFoot : MonoBehaviour {
 		// STEP BLOCKS
 		if (StateMachine_Twick.state == WalkState.CALCULATE_RIGHT_STEP) {
 			footTraj = calculateDesiredPosition();
+			print("Foot Traj: " + footTraj);
 			ragdoll.SendMessage("rightStep");
 			
 		} else if (StateMachine_Twick.state == WalkState.RIGHT_STEP) {
@@ -63,10 +65,12 @@ public class RightFoot : MonoBehaviour {
 		
 	}
 	
-	// Calculate desired position in world-coordinates
+	// Calculate desired position in hips-coordinates and store the hips transformation matrix
 	Vector3 calculateDesiredPosition(){
+		matrizReference = hips.transform.worldToLocalMatrix;
 		Vector3 calculatePos = new Vector3 (calculateFootDisplacement_X(), calculateFootDisplacement_Y(), calculateFootDisplacement_Z());
-		calculatePos = rightFoot.transform.localToWorldMatrix.MultiplyPoint (calculatePos);
+		calculatePos = rightFoot.transform.localToWorldMatrix.MultiplyPoint (calculatePos);		// Transform the maximum distance the foot can achieve to world coordinates
+		calculatePos = matrizReference.MultiplyPoint (calculatePos);
 		return calculatePos;
 	}
 	
@@ -90,7 +94,10 @@ public class RightFoot : MonoBehaviour {
 	
 	// Returns TRUE when the desired position is achieved
 	bool moveUntilDesired(Vector3 desiredPos){
-		if (rightFoot.transform.position.z > desiredPos.z)
+		//Transform the foot position to hips coordinates to compare the foot
+		Vector3 footInHipsCoord = matrizReference.MultiplyPoint (rightFoot.transform.position);
+
+		if (footInHipsCoord.z > desiredPos.z)
 			return true;
 		else {
 			rightFoot.MovePosition (transform.position + transform.forward * Time.deltaTime);

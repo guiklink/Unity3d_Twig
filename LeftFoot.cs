@@ -22,6 +22,7 @@ public class LeftFoot : MonoBehaviour {
 	GameObject footBase;
 	GameObject ragdoll;
 
+	Matrix4x4 matrizReference;	// Matrix reference to the hips
 	Vector3 footTraj; // Variable to store the path of the foot during the step
 
 	// Use this for initialization
@@ -65,10 +66,12 @@ public class LeftFoot : MonoBehaviour {
 
 	}
 
-	// Calculate desired position in world-coordinates
+	// Calculate desired position in hips-coordinates and store the hips transformation matrix
 	Vector3 calculateDesiredPosition(){
+		matrizReference = hips.transform.worldToLocalMatrix;
 		Vector3 calculatePos = new Vector3 (calculateFootDisplacement_X(), calculateFootDisplacement_Y(), calculateFootDisplacement_Z());
-		calculatePos = leftFoot.transform.localToWorldMatrix.MultiplyPoint (calculatePos);
+		calculatePos = leftFoot.transform.localToWorldMatrix.MultiplyPoint (calculatePos);		// Transform the maximum distance the foot can achieve to world coordinates
+		calculatePos = matrizReference.MultiplyPoint (calculatePos);
 		return calculatePos;
 	}
 
@@ -97,7 +100,10 @@ public class LeftFoot : MonoBehaviour {
 
 	// Returns TRUE when the desired position is achieved
 	bool moveUntilDesired(Vector3 desiredPos){
-		if (leftFoot.transform.position.z > desiredPos.z)
+		//Transform the foot position to hips coordinates to compare the foot
+		Vector3 footInHipsCoord = matrizReference.MultiplyPoint (leftFoot.transform.position);
+		
+		if (footInHipsCoord.z > desiredPos.z)
 			return true;
 		else {
 			leftFoot.MovePosition (transform.position + transform.forward * Time.deltaTime);
