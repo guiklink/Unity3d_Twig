@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class LeftFoot : MonoBehaviour {
 
+	bool isFirstStep;
+
 	// Public variables to control the step speed
 	float stepSpeed_x = 0.05f;
 	float stepSpeed_y = 0.05f;
@@ -35,27 +37,29 @@ public class LeftFoot : MonoBehaviour {
 		distanceFootToHip = Vector3.Distance(hips.transform.position, leftFoot.transform.position);
 		distanceToeBaseToHip = Vector3.Distance(hips.transform.position, footBase.transform.position);
 
+		isFirstStep = true;
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () {
 		// STEP BLOCKS
-		if (StateMachine_Twick.state == WalkState.LEFT_CROUCH) {
+		if (StateMachine_Twick.state == WalkState.CALCULATE_LEFT_STEP) {
 			footTraj = calculateDesiredPosition();
+			ragdoll.SendMessage("leftStep");
 
 		} else if (StateMachine_Twick.state == WalkState.LEFT_STEP) {
 			leftFoot.isKinematic = true;
 			if(moveUntilDesired(footTraj)){
 				leftFoot.isKinematic = false;
-				ragdoll.SendMessage("rightCrouch");
+				ragdoll.SendMessage("rightStepCalculate");
 			}
 		
 		// HOLD FOOT IN PLACE
-		} else if(StateMachine_Twick.state == WalkState.RIGHT_CROUCH || StateMachine_Twick.state == WalkState.RIGHT_STEP){
+		} else if(StateMachine_Twick.state == WalkState.CALCULATE_RIGHT_STEP || StateMachine_Twick.state == WalkState.RIGHT_STEP){
 			leftFoot.transform.position.Set(lockPosition.x, leftFoot.position.y, lockPosition.z);
 			leftFoot.MoveRotation(new Quaternion(0, 0, 0, 1));
 
-		} else if(StateMachine_Twick.state != WalkState.RIGHT_CROUCH && StateMachine_Twick.state != WalkState.RIGHT_STEP){
+		} else if(StateMachine_Twick.state != WalkState.CALCULATE_RIGHT_STEP && StateMachine_Twick.state != WalkState.RIGHT_STEP){
 			lockPosition = leftFoot.transform.position;
 		}
 
@@ -83,7 +87,12 @@ public class LeftFoot : MonoBehaviour {
 		float h = StandSwat.walkingHeight;
 		float H = distanceToeBaseToHip; // Only use 90% of the distance between hip and foot
 		float legDisplacementInZ = Mathf.Sqrt (Mathf.Pow(H,2) - Mathf.Pow(h,2));
-		return legDisplacementInZ;
+		if (isFirstStep) {
+			isFirstStep = false;
+			return legDisplacementInZ;
+		}
+		else
+			return 2 * legDisplacementInZ;
 	}
 
 	// Returns TRUE when the desired position is achieved

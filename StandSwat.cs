@@ -14,7 +14,7 @@ public class StandSwat : MonoBehaviour {
 	public float kdZ = 100f;
 	float ePrevZ = 0;
 	public float walkingSpeed = 1000f;
-
+	
 	float standError;
 	Vector3 alignError;
 	Vector3 standingPosition;
@@ -58,31 +58,23 @@ public class StandSwat : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		//print (balancingHeight);
-
 		// The mid point controls the X-axis and Z-axis of the ragdoll alligned according to its feet
 		if (StateMachine_Twick.state == WalkState.STAND)
 			midPoint = midPoint;
+
+		else if (StateMachine_Twick.state == WalkState.CROUCH_TO_WALK) {
+			balancingHeight -= 0.003f;
+			if (balancingHeight <= walkingHeight)
+				ragdoll.SendMessage ("pickLeg");
+		}
 
 		else if (StateMachine_Twick.state == WalkState.PICK_LEG){
 			//if(shouldRightLegStep)
 			//	ragdoll.SendMessage("rightCrouch");
 			//else
-			ragdoll.SendMessage("leftCrouch");
+			ragdoll.SendMessage("leftStepCalculate");
 			//ragdoll.SendMessage("rightCrouch");
 		}
-
-		else if (StateMachine_Twick.state == WalkState.LEFT_CROUCH) {
-			balancingHeight -= 0.003f;
-			if (balancingHeight <= walkingHeight)
-				ragdoll.SendMessage ("leftStep");
-		}
-
-		else if (StateMachine_Twick.state == WalkState.RIGHT_CROUCH) {
-			balancingHeight -= 0.003f;
-			if (balancingHeight <= walkingHeight)
-				ragdoll.SendMessage ("rightStep");
-		} 
 
 		if (StateMachine_Twick.state != WalkState.STAND)
 			midPoint = new Vector3 (midPoint.x, midPoint.y, (rightFoot.transform.position.z + leftFoot.transform.position.z) / 2);

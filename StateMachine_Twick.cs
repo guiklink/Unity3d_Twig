@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public enum WalkState : short {STAND, PICK_LEG, LEFT_CROUCH, RIGHT_CROUCH, LEFT_STEP, RIGHT_STEP};
+public enum WalkState : short {STAND, PICK_LEG, CROUCH_TO_WALK, CALCULATE_LEFT_STEP, CALCULATE_RIGHT_STEP, LEFT_STEP, RIGHT_STEP};
 
 public class StateMachine_Twick : MonoBehaviour {
 
@@ -21,16 +21,25 @@ public class StateMachine_Twick : MonoBehaviour {
 				state = WalkState.STAND;
 			} 
 		else if(state == WalkState.STAND)
-				state = WalkState.PICK_LEG;
+				state = WalkState.CROUCH_TO_WALK;
 	}
 
-	void leftCrouch(){
-		state = WalkState.LEFT_CROUCH;
+	void pickLeg(){
+		state = WalkState.PICK_LEG;
+	}
+
+	void crouchToWalk(){
+		state = WalkState.CROUCH_TO_WALK;
 		print (state);
 	}
 
-	void rightCrouch(){
-		state = WalkState.RIGHT_STEP;
+	void leftStepCalculate(){
+		state = WalkState.CALCULATE_LEFT_STEP;
+		print (state);
+	}
+	
+	void rightStepCalculate(){
+		state = WalkState.CALCULATE_RIGHT_STEP;
 		print (state);
 	}
 

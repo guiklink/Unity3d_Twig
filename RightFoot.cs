@@ -40,24 +40,24 @@ public class RightFoot : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () {
 		// STEP BLOCKS
-		if (StateMachine_Twick.state == WalkState.RIGHT_CROUCH) {
+		if (StateMachine_Twick.state == WalkState.CALCULATE_RIGHT_STEP) {
 			footTraj = calculateDesiredPosition();
-			print ("TRAJECTORY CALCULATED!");
+			ragdoll.SendMessage("rightStep");
 			
 		} else if (StateMachine_Twick.state == WalkState.RIGHT_STEP) {
 			rightFoot.isKinematic = true;
 			print("Target: " + footTraj);
 			if(moveUntilDesired(footTraj)){
 				rightFoot.isKinematic = false;
-				//ragdoll.SendMessage("leftCrouch");
+				ragdoll.SendMessage("leftStepCalculate");
 			}
 			
 			// HOLD FOOT IN PLACE
-		} else if(StateMachine_Twick.state == WalkState.LEFT_CROUCH || StateMachine_Twick.state == WalkState.LEFT_STEP){
+		} else if(StateMachine_Twick.state == WalkState.CALCULATE_LEFT_STEP || StateMachine_Twick.state == WalkState.LEFT_STEP){
 			rightFoot.transform.position.Set(lockPosition.x, rightFoot.position.y, lockPosition.z);
 			rightFoot.MoveRotation(new Quaternion(0, 0, 0, 1));
 			
-		} else if(StateMachine_Twick.state != WalkState.LEFT_CROUCH && StateMachine_Twick.state != WalkState.LEFT_STEP){
+		} else if(StateMachine_Twick.state != WalkState.CALCULATE_LEFT_STEP && StateMachine_Twick.state != WalkState.LEFT_STEP){
 			lockPosition = rightFoot.transform.position;
 		}
 		
@@ -85,7 +85,7 @@ public class RightFoot : MonoBehaviour {
 		float h = StandSwat.walkingHeight;
 		float H = distanceToeBaseToHip; // Only use 90% of the distance between hip and foot
 		float legDisplacementInZ = Mathf.Sqrt (Mathf.Pow(H,2) - Mathf.Pow(h,2));
-		return legDisplacementInZ;
+		return 2 * legDisplacementInZ;
 	}
 	
 	// Returns TRUE when the desired position is achieved
