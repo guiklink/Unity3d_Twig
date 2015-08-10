@@ -30,27 +30,27 @@ public class StateMachine_Twick : MonoBehaviour {
 
 	void crouchToWalk(){
 		state = WalkState.CROUCH_TO_WALK;
-		print (state);
+		//print (state);
 	}
 
 	void leftStepCalculate(){
 		state = WalkState.CALCULATE_LEFT_STEP;
-		print (state);
+		//print (state);
 	}
 	
 	void rightStepCalculate(){
 		state = WalkState.CALCULATE_RIGHT_STEP;
-		print (state);
+		//print (state);
 	}
 
 	void leftStep(){
 		state = WalkState.LEFT_STEP;
-		print (state);
+		//print (state);
 	}
 
 	void rightStep(){
 		state = WalkState.RIGHT_STEP;
-		print (state);
+		//print (state);
 	}
 
 }

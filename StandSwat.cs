@@ -69,12 +69,10 @@ public class StandSwat : MonoBehaviour {
 		}
 
 		else if (StateMachine_Twick.state == WalkState.PICK_LEG){
-			//if(shouldRightLegStep)
-			//	ragdoll.SendMessage("rightCrouch");
-			//else
 			//ragdoll.SendMessage("leftStepCalculate");
+			//rightFoot.SendMessage("isNotFirstStep");
+			leftFoot.SendMessage("isNotFirstStep");
 			ragdoll.SendMessage("rightStepCalculate");
-			//ragdoll.SendMessage("rightCrouch");
 		}
 
 		if (StateMachine_Twick.state != WalkState.STAND)
