@@ -20,11 +20,11 @@ public class StandSwat : MonoBehaviour {
 	Vector3 standingPosition;
 	float balancingHeight;
 	Rigidbody rb;
-	Vector3 midPointPrev;
+	//Vector3 midPointPrev;
 
 	GameObject leftFoot;
 	GameObject rightFoot;
-	GameObject hips;
+	//GameObject hips;
 	GameObject ragdoll;
 	Vector3 midPoint;
 
@@ -35,7 +35,7 @@ public class StandSwat : MonoBehaviour {
 		// Store Position of the relevant body parts (this must be made generic eventually)
 		leftFoot = GameObject.Find("/swat/Hips/LeftUpLeg/LeftLeg/LeftFoot");
 		rightFoot = GameObject.Find("/swat/Hips/RightUpLeg/RightLeg/RightFoot");
-		hips = GameObject.Find("/swat/Hips");
+		//hips = GameObject.Find("/swat/Hips");
 		ragdoll = GameObject.Find("/swat");
 
 		InitPD ();
@@ -53,7 +53,7 @@ public class StandSwat : MonoBehaviour {
 
 		//This must be removed once the doll starts moving
 		midPoint = (rightFoot.transform.position + leftFoot.transform.position) / 2;
-		midPointPrev = (rightFoot.transform.position + leftFoot.transform.position)/2;
+		//midPointPrev = (rightFoot.transform.position + leftFoot.transform.position)/2;
 	}
 	
 	// Update is called once per frame
