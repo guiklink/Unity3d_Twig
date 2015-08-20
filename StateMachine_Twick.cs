@@ -15,8 +15,8 @@ public class StateMachine_Twick : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () {
 		//print (state);
-		float force = Input.GetAxisRaw ("Vertical");
-		//float force = 0;
+		//float force = Input.GetAxisRaw ("Vertical");
+		float force = 0;
 
 		if (force == 0) {
 				state = WalkState.STAND;
