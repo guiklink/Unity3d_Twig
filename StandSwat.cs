@@ -25,6 +25,7 @@ public class StandSwat : MonoBehaviour {
 	GameObject leftFoot;
 	GameObject rightFoot;
 	//GameObject hips;
+	GameObject rightArm;
 	GameObject ragdoll;
 	Vector3 midPoint;
 
@@ -36,6 +37,7 @@ public class StandSwat : MonoBehaviour {
 		leftFoot = GameObject.Find("/swat/Hips/LeftUpLeg/LeftLeg/LeftFoot");
 		rightFoot = GameObject.Find("/swat/Hips/RightUpLeg/RightLeg/RightFoot");
 		//hips = GameObject.Find("/swat/Hips");
+		rightArm = GameObject.Find("/swat/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm");
 		ragdoll = GameObject.Find("/swat");
 
 		InitPD ();
@@ -69,6 +71,7 @@ public class StandSwat : MonoBehaviour {
 		}
 
 		else if (StateMachine_Twick.state == WalkState.PICK_LEG){
+			rightArm.SendMessage("setGoingFront", true);
 			//ragdoll.SendMessage("leftStepCalculate");
 			//rightFoot.SendMessage("isNotFirstStep");
 			leftFoot.SendMessage("isNotFirstStep");
