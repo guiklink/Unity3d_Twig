@@ -45,6 +45,11 @@ public class LeftFoot : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
+		//////////////////////// CONDITIONAL STATES (Multiple of these IFs make occur during the same fixed update)
+		
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 		//////////////////// UNIQUE STATES (Only one of these ELSE IF blocks will be evaluated at it fixed update)
 		if (StateMachine_Twick.state == WalkState.CALCULATE_LEFT_STEP) {
 			footTraj = calculateDesiredPosition ();
@@ -67,16 +72,18 @@ public class LeftFoot : MonoBehaviour {
 			leftFoot.transform.position.Set (lockPosition.x, leftFoot.position.y, lockPosition.z);
 			leftFoot.MoveRotation (new Quaternion (0, 0, 0, 1));
 
-		} else if (StateMachine_Twick.state != WalkState.CALCULATE_RIGHT_STEP && StateMachine_Twick.state != WalkState.RIGHT_STEP) {
+		} else if (StateMachine_Twick.state != WalkState.CALCULATE_RIGHT_STEP && StateMachine_Twick.state != WalkState.RIGHT_STEP && StateMachine_Twick.state != WalkState.STAND) {
 			lockPosition = leftFoot.transform.position;
 		}
 
 		// STAND POSITION
-		else if (StateMachine_Twick.state == WalkState.STAND) {
+		else if (StateMachine_Twick.state == WalkState.STAND || StateMachine_Twick.state == WalkState.CROUCH_TO_WALK || StateMachine_Twick.state == WalkState.RISE_TO_STAND) {
+			lockPosition = rightFoot.transform.position;
 			leftFoot.MoveRotation (new Quaternion (0, 0, 0, 1));
+			leftFoot.angularVelocity.Set(0, 0, 0);
+			leftFoot.velocity.Set(0,0,0);
 		}
-		//////////////////////////////////////////////////////////////////////////////////////////////////////
-
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	}
 
 	// Calculate desired position in foot-coordinates and store the foot transformation matrix

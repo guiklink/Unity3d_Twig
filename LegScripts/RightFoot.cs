@@ -45,7 +45,12 @@ public class RightFoot : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		// UNIQUE STATES (Only one of these ELSE IF blocks will be evaluated at it fixed update)
+		//////////////////////// CONDITIONAL STATES (Multiple of these IFs make occur during the same fixed update)
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+		//////////////////// UNIQUE STATES (Only one of these ELSE IF blocks will be evaluated at it fixed update)
 		if (StateMachine_Twick.state == WalkState.CALCULATE_RIGHT_STEP) {
 			footTraj = calculateDesiredPosition();
 			ragdoll.SendMessage("rightStep");
@@ -67,16 +72,18 @@ public class RightFoot : MonoBehaviour {
 			rightFoot.transform.position.Set(lockPosition.x, rightFoot.position.y, lockPosition.z);
 			rightFoot.MoveRotation(new Quaternion(0, 0, 0, 1));
 			
-		} else if(StateMachine_Twick.state != WalkState.CALCULATE_LEFT_STEP && StateMachine_Twick.state != WalkState.LEFT_STEP){
+		} else if(StateMachine_Twick.state != WalkState.CALCULATE_LEFT_STEP && StateMachine_Twick.state != WalkState.LEFT_STEP && StateMachine_Twick.state != WalkState.STAND){
 			lockPosition = rightFoot.transform.position;
 		}
 
 		// STAND POSITION
-		else if (StateMachine_Twick.state == WalkState.STAND) {
+		else if (StateMachine_Twick.state == WalkState.STAND || StateMachine_Twick.state == WalkState.CROUCH_TO_WALK || StateMachine_Twick.state == WalkState.RISE_TO_STAND) {
+			lockPosition = rightFoot.transform.position;
 			rightFoot.MoveRotation (new Quaternion (0, 0, 0, 1));
+			rightFoot.angularVelocity.Set(0, 0, 0);
+			rightFoot.velocity.Set(0,0,0);
 		}
-		//////////////////////////////////////////////////////////////////////////////////////////////////////
-
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	}
 	
 	// Calculate desired position in foot-coordinates and store the foot transformation matrix
