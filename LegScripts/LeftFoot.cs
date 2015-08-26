@@ -4,8 +4,6 @@ using System.Collections.Generic;
 
 public class LeftFoot : MonoBehaviour {
 
-	bool isFirstStep;
-
 	// Public variables to control the step speed
 	float stepSpeed_x = 0.05f;
 	float stepSpeed_y = 0.05f;
@@ -22,6 +20,8 @@ public class LeftFoot : MonoBehaviour {
 	GameObject footBase;
 	GameObject ragdoll;
 	GameObject rightFoot;
+
+	bool isLastStep; // This variable tells if it is the last step before stopping movement, if yes a different state of the state machine will need to be called
 
 	Matrix4x4 matrizReference;	// Matrix reference to the hips
 	Vector3 footTraj; // Variable to store the path of the foot during the step
@@ -40,7 +40,7 @@ public class LeftFoot : MonoBehaviour {
 		distanceFootToHip = Vector3.Distance(hips.transform.position, leftFoot.transform.position);
 		distanceToeBaseToHip = Vector3.Distance(hips.transform.position, footBase.transform.position);
 
-		isFirstStep = true;
+		isLastStep = false;
 	}
 	
 	// Update is called once per frame
@@ -54,7 +54,12 @@ public class LeftFoot : MonoBehaviour {
 			leftFoot.isKinematic = true;
 			if (moveUntilDesired (footTraj)) {
 				leftFoot.isKinematic = false;
-				ragdoll.SendMessage ("rightStepCalculate");
+				if(isLastStep){					// is this was the last step a new state to return to the initial position must be called instead
+					isLastStep = false;			// restart the variable
+					ragdoll.SendMessage("liftingToStand");	
+				}
+				else
+					ragdoll.SendMessage ("rightStepCalculate");
 			}
 		
 			// HOLD FOOT IN PLACE
@@ -98,17 +103,20 @@ public class LeftFoot : MonoBehaviour {
 		float h = StandSwat.walkingHeight;
 		float H = distanceToeBaseToHip; // Only use 90% of the distance between hip and foot
 		float legDisplacementInZ = Mathf.Sqrt (Mathf.Pow(H,2) - Mathf.Pow(h,2));
-		if (isFirstStep) {
-			isFirstStep = false;
+		if (StateMachine_Twick.isFirstStep) {
+			ragdoll.SendMessage ("firstStepGiven");
 			return legDisplacementInZ;
+		} else if (StateMachine_Twick.finalizingMovement) {
+			isLastStep = true;	// This is the calculation for the last step
+			return (calculateFootDisplacementAccordingToOtherFoot_Z() > legDisplacementInZ) ? calculateFootDisplacementAccordingToOtherFoot_Z() : legDisplacementInZ; // the distance to move enought to allign with the other foot
 		}
 		else
-			return (calculateFootDisplacementAccordingToOtherFoot_Z() > legDisplacementInZ * 2) ? calculateFootDisplacementAccordingToOtherFoot_Z() : legDisplacementInZ * 2;
+			return (calculateFootDisplacementAccordingToOtherFoot_Z() * 2 > legDisplacementInZ * 2) ? calculateFootDisplacementAccordingToOtherFoot_Z() * 2 : legDisplacementInZ * 2; // the distance is doubled because otherwise it will only move enought to allign with the other foot
 	}
 
 	float calculateFootDisplacementAccordingToOtherFoot_Z(){
 		Vector3 rightFootPos = matrizReference.MultiplyPoint (rightFoot.transform.position); 	// calculate the right foot position using the left foot frame (matrixReference was updated in calculateDesiredPosition())
-		return rightFootPos.z * 2;	// the next step should have a Z with twice of the distance of the right foot
+		return rightFootPos.z;	// return the coordinates in Z from the left foot in rightfoot coordinates
 	}
 
 	// Returns TRUE when the desired position is achieved
@@ -123,10 +131,6 @@ public class LeftFoot : MonoBehaviour {
 			leftFoot.MoveRotation(new Quaternion(0, 0, 0, 1));
 			return false;
 		}
-	}
-
-	void isNotFirstStep(){
-		isFirstStep = false;
 	}
 
 	void printMatrix4x4(Matrix4x4 matrix){

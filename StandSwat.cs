@@ -14,10 +14,11 @@ public class StandSwat : MonoBehaviour {
 	public float kdZ = 100f;
 	float ePrevZ = 0;
 	public float walkingSpeed = 1000f;
+	float maximumTurningPerUpdate = 200f;
 	
 	float standError;
 	Vector3 alignError;
-	Vector3 standingPosition;
+	float standingPosition;
 	float balancingHeight;
 	Rigidbody rb;
 	//Vector3 midPointPrev;
@@ -26,8 +27,10 @@ public class StandSwat : MonoBehaviour {
 	GameObject rightFoot;
 	//GameObject hips;
 	GameObject rightArm;
+	GameObject leftArm;
 	GameObject ragdoll;
 	Vector3 midPoint;
+
 
 	// Use this for initialization
 	void Start () {
@@ -38,6 +41,7 @@ public class StandSwat : MonoBehaviour {
 		rightFoot = GameObject.Find("/swat/Hips/RightUpLeg/RightLeg/RightFoot");
 		//hips = GameObject.Find("/swat/Hips");
 		rightArm = GameObject.Find("/swat/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm");
+		leftArm = GameObject.Find("/swat/Hips/Spine/Spine1/Spine2/RightShoulder/LeftArm");
 		ragdoll = GameObject.Find("/swat");
 
 		InitPD ();
@@ -48,10 +52,10 @@ public class StandSwat : MonoBehaviour {
 		standError = 0f;
 
 		// Use this variable to store the Y reference of standing
-		standingPosition = transform.position;
+		standingPosition = transform.position.y; 
 
 		// THIS VARIABLE NEEDS TO BE ACCOUNTED FOR CASES THAT THE DOLL DOESNT START IN Y = 0
-		balancingHeight = standingPosition.y;
+		balancingHeight = standingPosition;
 
 		//This must be removed once the doll starts moving
 		midPoint = (rightFoot.transform.position + leftFoot.transform.position) / 2;
@@ -70,12 +74,30 @@ public class StandSwat : MonoBehaviour {
 				ragdoll.SendMessage ("pickLeg");
 		}
 
+		else if (StateMachine_Twick.state == WalkState.RISE_TO_STAND) {
+			balancingHeight += 0.003f;
+			if (balancingHeight >= standingPosition)
+				ragdoll.SendMessage ("standPosition");
+		}
+
 		else if (StateMachine_Twick.state == WalkState.PICK_LEG){
-			rightArm.SendMessage("setGoingFront", true);
+			if(shouldRightLegStep()){
+				//rightArm.SendMessage("setGoingFront", true);
+				//leftArm.SendMessage("setGoingFront", false);
+				ragdoll.SendMessage("rightStepCalculate");
+			}
+			else{
+				//leftArm.SendMessage("setGoingFront", true);
+				//rightArm.SendMessage("setGoingFront", false);
+				ragdoll.SendMessage("leftStepCalculate");
+			}
+
+			//rightArm.SendMessage("setGoingFront", true);
+			//leftArm.SendMessage("setGoingFront", false);
 			//ragdoll.SendMessage("leftStepCalculate");
 			//rightFoot.SendMessage("isNotFirstStep");
-			leftFoot.SendMessage("isNotFirstStep");
-			ragdoll.SendMessage("rightStepCalculate");
+			//leftFoot.SendMessage("isNotFirstStep");
+			//ragdoll.SendMessage("rightStepCalculate");
 		}
 
 		if (StateMachine_Twick.state != WalkState.STAND)
@@ -110,19 +132,32 @@ public class StandSwat : MonoBehaviour {
 		rb.AddForce (forceUpdate);
 	}
 
-	// Function returns true if right leg should give the next step and false if left leg should step
+	// Function returns true if right leg is behind left leg and false otherwise
 	bool shouldRightLegStep(){
 		Vector3 leftFootCoordInHipCoord = rb.transform.localToWorldMatrix.MultiplyPoint (leftFoot.transform.position);
 		Vector3 rightFootCoordInHipCoord = rb.transform.localToWorldMatrix.MultiplyPoint (rightFoot.transform.position);
 
 		if (rightFootCoordInHipCoord.z >= leftFootCoordInHipCoord.z)
-			return true;
-		else
 			return false;
+		else
+			return true;
 	}
 
 	void printFeetPosition(){
 		print ("Right foot: " + rightFoot.transform.position);
 		print ("Left foot: " + leftFoot.transform.position);
+	}
+
+	void turnLeft(){
+		bodyRotate (-1);
+
+	}
+
+	void turnRight(){
+		bodyRotate (1);
+	}
+
+	void bodyRotate(float side){
+		rb.transform.Rotate (0, side * maximumTurningPerUpdate * Time.deltaTime, 0);
 	}
 }
