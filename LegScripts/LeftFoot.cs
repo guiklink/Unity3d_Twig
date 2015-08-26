@@ -45,7 +45,7 @@ public class LeftFoot : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		// STEP BLOCKS
+		//////////////////// UNIQUE STATES (Only one of these ELSE IF blocks will be evaluated at it fixed update)
 		if (StateMachine_Twick.state == WalkState.CALCULATE_LEFT_STEP) {
 			footTraj = calculateDesiredPosition ();
 			ragdoll.SendMessage ("leftStep");
@@ -75,6 +75,7 @@ public class LeftFoot : MonoBehaviour {
 		else if (StateMachine_Twick.state == WalkState.STAND) {
 			leftFoot.MoveRotation (new Quaternion (0, 0, 0, 1));
 		}
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	}
 
