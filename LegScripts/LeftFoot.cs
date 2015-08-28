@@ -79,7 +79,8 @@ public class LeftFoot : MonoBehaviour {
 		// STAND POSITION
 		else if (StateMachine_Twick.state == WalkState.STAND || StateMachine_Twick.state == WalkState.CROUCH_TO_WALK || StateMachine_Twick.state == WalkState.RISE_TO_STAND) {
 			lockPosition = rightFoot.transform.position;
-			leftFoot.MoveRotation (new Quaternion (0, 0, 0, 1));
+			//leftFoot.MoveRotation (new Quaternion (0, 0, 0, 1));
+			leftFoot.MoveRotation (Quaternion.Euler(0, hips.transform.rotation.eulerAngles.y,0));
 			leftFoot.angularVelocity.Set(0, 0, 0);
 			leftFoot.velocity.Set(0,0,0);
 		}

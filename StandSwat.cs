@@ -14,7 +14,6 @@ public class StandSwat : MonoBehaviour {
 	public float kdZ = 100f;
 	float ePrevZ = 0;
 	public float walkingSpeed = 1000f;
-	float maximumTurningPerUpdate = 200f;
 	
 	float standError;
 	Vector3 alignError;
@@ -148,16 +147,16 @@ public class StandSwat : MonoBehaviour {
 		print ("Left foot: " + leftFoot.transform.position);
 	}
 
-	void turnLeft(){
-		bodyRotate (-1);
+	void turnLeft(float speed){
+		bodyRotate (-1, speed);
 
 	}
 
-	void turnRight(){
-		bodyRotate (1);
+	void turnRight(float speed){
+		bodyRotate (1, speed);
 	}
 
-	void bodyRotate(float side){
-		rb.transform.Rotate (0, side * maximumTurningPerUpdate * Time.deltaTime, 0);
+	void bodyRotate(float side, float speed){
+		rb.transform.Rotate (0, side * speed * Time.deltaTime, 0);
 	}
 }
