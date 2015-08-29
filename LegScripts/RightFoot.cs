@@ -70,7 +70,9 @@ public class RightFoot : MonoBehaviour {
 			// HOLD FOOT IN PLACE
 		} else if(StateMachine_Twick.state == WalkState.CALCULATE_LEFT_STEP || StateMachine_Twick.state == WalkState.LEFT_STEP){
 			rightFoot.transform.position.Set(lockPosition.x, rightFoot.position.y, lockPosition.z);
-			rightFoot.MoveRotation(new Quaternion(0, 0, 0, 1));
+			//rightFoot.MoveRotation(new Quaternion(0, 0, 0, 1));
+			//rightFoot.MoveRotation(Quaternion.Euler(0,rightFoot.transform.rotation.eulerAngles.y,0));
+			rightFoot.MoveRotation(StateMachine_Twick.orientation);
 			
 		} else if(StateMachine_Twick.state != WalkState.CALCULATE_LEFT_STEP && StateMachine_Twick.state != WalkState.LEFT_STEP && StateMachine_Twick.state != WalkState.STAND){
 			lockPosition = rightFoot.transform.position;
@@ -90,7 +92,8 @@ public class RightFoot : MonoBehaviour {
 	// Calculate desired position in foot-coordinates and store the foot transformation matrix
 	Vector3 calculateDesiredPosition(){
 		//rightFoot.MoveRotation (new Quaternion (0, 0, 0, 1));
-		rightFoot.MoveRotation(Quaternion.Euler(0,rightFoot.transform.rotation.eulerAngles.y,0));
+		//rightFoot.MoveRotation(Quaternion.Euler(0,rightFoot.transform.rotation.eulerAngles.y,0));
+		rightFoot.MoveRotation(StateMachine_Twick.orientation);
 		matrizReference = rightFoot.transform.worldToLocalMatrix;
 		Vector3 calculatePos = new Vector3 (calculateFootDisplacement_X(), calculateFootDisplacement_Y(), calculateFootDisplacement_Z());
 		return calculatePos;
@@ -137,7 +140,8 @@ public class RightFoot : MonoBehaviour {
 		else {
 			rightFoot.MovePosition (rightFoot.transform.position + rightFoot.transform.forward * Time.deltaTime);
 			//rightFoot.MoveRotation(new Quaternion(0, 0, 0, 1));
-			rightFoot.MoveRotation(Quaternion.Euler(0,rightFoot.transform.rotation.eulerAngles.y,0));
+			//rightFoot.MoveRotation(Quaternion.Euler(0,rightFoot.transform.rotation.eulerAngles.y,0));
+			rightFoot.MoveRotation(StateMachine_Twick.orientation);
 			return false;
 		}
 	}

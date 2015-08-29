@@ -9,14 +9,16 @@ public class StateMachine_Twick : MonoBehaviour {
 	public static bool isTurning;					// Is true whenever the dool is turning
 	public static bool isFirstStep;					// Tells if it is the first step from the STAND state, in this case the leg will move less
 	public static bool finalizingMovement; 			// If this is true after this step the ragdoll should go back to the STAND position
-	public float turningSpeed = 100f;	// Turning speed of the doll
+	public float turningSpeed = 100f;				// Turning speed of the doll
+	public static Quaternion orientation;					// Orientation that the points to the front of the doll
 
 	GameObject hips;
 
 	// Use this for initialization
 	void Start () {
 		hips = GameObject.Find("/swat/Hips"); 
-
+		orientation = hips.transform.rotation;
+		print("Starting Orientation: " + orientation.eulerAngles);
 		state = WalkState.STAND;
 		isFirstStep = true;
 		finalizingMovement = false;
@@ -25,7 +27,7 @@ public class StateMachine_Twick : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		print (state);
+		//print (state);
 		//print (finalizingMovement);
 		float force = Input.GetAxisRaw ("Vertical");
 		//float force = 0;
