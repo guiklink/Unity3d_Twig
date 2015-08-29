@@ -35,10 +35,12 @@ public class StateMachine_Twick : MonoBehaviour {
 
 		if (twist == 1) {
 			isTurning = true;
-			hips.SendMessage ("turnRight", turningSpeed);
+			//hips.SendMessage ("turnRight", turningSpeed);
+			bodyRotate(1, turningSpeed);
 		} else if (twist == -1) {
 			isTurning = true;
-			hips.SendMessage ("turnLeft", turningSpeed);
+			//hips.SendMessage ("turnLeft", turningSpeed);
+			bodyRotate(1, turningSpeed);
 		} else
 			isTurning = false;
 
@@ -102,6 +104,10 @@ public class StateMachine_Twick : MonoBehaviour {
 		finalizingMovement = false;
 		isFirstStep = true;
 		state = WalkState.STAND;
+	}
+
+	void bodyRotate(float side, float speed){
+		orientation = Quaternion.Euler(0,orientation.eulerAngles.y + side * speed * Time.deltaTime, 0);
 	}
 
 }

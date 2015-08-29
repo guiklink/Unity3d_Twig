@@ -71,6 +71,7 @@ public class LeftFoot : MonoBehaviour {
 		} else if (StateMachine_Twick.state == WalkState.CALCULATE_RIGHT_STEP || StateMachine_Twick.state == WalkState.RIGHT_STEP) {
 			leftFoot.transform.position.Set (lockPosition.x, leftFoot.position.y, lockPosition.z);
 			//leftFoot.MoveRotation (Quaternion.Euler(0, hips.transform.rotation.eulerAngles.y,0));
+			print ("Rotation = " + StateMachine_Twick.orientation);
 			leftFoot.MoveRotation(StateMachine_Twick.orientation);
 
 		} else if (StateMachine_Twick.state != WalkState.CALCULATE_RIGHT_STEP && StateMachine_Twick.state != WalkState.RIGHT_STEP && StateMachine_Twick.state != WalkState.STAND) {
@@ -82,6 +83,7 @@ public class LeftFoot : MonoBehaviour {
 			lockPosition = rightFoot.transform.position;
 			//leftFoot.MoveRotation (new Quaternion (0, 0, 0, 1));
 			//leftFoot.MoveRotation (Quaternion.Euler(0, hips.transform.rotation.eulerAngles.y,0));
+			print ("Rotation = " + StateMachine_Twick.orientation);
 			leftFoot.MoveRotation(StateMachine_Twick.orientation);
 			leftFoot.angularVelocity.Set(0, 0, 0);
 			leftFoot.velocity.Set(0,0,0);
@@ -91,7 +93,8 @@ public class LeftFoot : MonoBehaviour {
 
 	// Calculate desired position in foot-coordinates and store the foot transformation matrix
 	Vector3 calculateDesiredPosition(){
-		leftFoot.MoveRotation(new Quaternion(0, 0, 0, 1));
+		//leftFoot.MoveRotation(new Quaternion(0, 0, 0, 1));
+		leftFoot.MoveRotation (StateMachine_Twick.orientation);
 		matrizReference = leftFoot.transform.worldToLocalMatrix;
 		Vector3 calculatePos = new Vector3 (calculateFootDisplacement_X(), calculateFootDisplacement_Y(), calculateFootDisplacement_Z());
 		//calculatePos = leftFoot.transform.localToWorldMatrix.MultiplyPoint (calculatePos);		// Transform the maximum distance the foot can achieve to world coordinates
@@ -138,9 +141,11 @@ public class LeftFoot : MonoBehaviour {
 		if (footInFootCoord.z > desiredPos.z)
 			return true;
 		else {
+			print ("Rotation = " + StateMachine_Twick.orientation);
+			//leftFoot.MoveRotation(StateMachine_Twick.orientation);
+			leftFoot.rotation.Set(StateMachine_Twick.orientation.x,StateMachine_Twick.orientation.y,StateMachine_Twick.orientation.z,StateMachine_Twick.orientation.w);
 			leftFoot.MovePosition (transform.position + transform.forward * Time.deltaTime);
 			//leftFoot.MoveRotation (Quaternion.Euler(0, hips.transform.rotation.eulerAngles.y,0));
-			leftFoot.MoveRotation(StateMachine_Twick.orientation);
 			return false;
 		}
 	}

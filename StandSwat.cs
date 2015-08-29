@@ -63,6 +63,9 @@ public class StandSwat : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
+		// Rotate the hips according to the global reference
+		rb.MoveRotation (StateMachine_Twick.orientation);
+
 		// The mid point controls the X-axis and Z-axis of the ragdoll alligned according to its feet
 		if (StateMachine_Twick.state == WalkState.STAND)
 			midPoint = midPoint;
@@ -147,7 +150,7 @@ public class StandSwat : MonoBehaviour {
 		print ("Left foot: " + leftFoot.transform.position);
 	}
 
-	void turnLeft(float speed){
+	/*void turnLeft(float speed){
 		bodyRotate (-1, speed);
 
 	}
@@ -158,5 +161,5 @@ public class StandSwat : MonoBehaviour {
 
 	void bodyRotate(float side, float speed){
 		rb.transform.Rotate (0, side * speed * Time.deltaTime, 0);
-	}
+	}*/
 }

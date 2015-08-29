@@ -79,10 +79,10 @@ public class RightFoot : MonoBehaviour {
 		}
 
 		// STAND POSITION
-		else if ((StateMachine_Twick.state == WalkState.STAND || StateMachine_Twick.state == WalkState.CROUCH_TO_WALK || StateMachine_Twick.state == WalkState.RISE_TO_STAND) && !StateMachine_Twick.isTurning) {
+		else if ((StateMachine_Twick.state == WalkState.STAND || StateMachine_Twick.state == WalkState.CROUCH_TO_WALK || StateMachine_Twick.state == WalkState.RISE_TO_STAND)) {
 			lockPosition = rightFoot.transform.position;
 			//rightFoot.MoveRotation (new Quaternion (0, 0, 0, 1));
-			rightFoot.MoveRotation (Quaternion.Euler(0, hips.transform.rotation.eulerAngles.y,0));
+			rightFoot.MoveRotation (StateMachine_Twick.orientation);
 			rightFoot.angularVelocity.Set(0, 0, 0);
 			rightFoot.velocity.Set(0,0,0);
 		}
@@ -138,10 +138,11 @@ public class RightFoot : MonoBehaviour {
 		if (footInFootCoord.z > desiredPos.z)
 			return true;
 		else {
+			//rightFoot.MoveRotation(StateMachine_Twick.orientation);
+			rightFoot.rotation.Set(StateMachine_Twick.orientation.x,StateMachine_Twick.orientation.y,StateMachine_Twick.orientation.z,StateMachine_Twick.orientation.w);
 			rightFoot.MovePosition (rightFoot.transform.position + rightFoot.transform.forward * Time.deltaTime);
 			//rightFoot.MoveRotation(new Quaternion(0, 0, 0, 1));
 			//rightFoot.MoveRotation(Quaternion.Euler(0,rightFoot.transform.rotation.eulerAngles.y,0));
-			rightFoot.MoveRotation(StateMachine_Twick.orientation);
 			return false;
 		}
 	}
