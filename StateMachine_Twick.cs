@@ -40,7 +40,7 @@ public class StateMachine_Twick : MonoBehaviour {
 		} else if (twist == -1) {
 			isTurning = true;
 			//hips.SendMessage ("turnLeft", turningSpeed);
-			bodyRotate(1, turningSpeed);
+			bodyRotate(-1, turningSpeed);
 		} else
 			isTurning = false;
 

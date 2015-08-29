@@ -140,13 +140,18 @@ public class RightFoot : MonoBehaviour {
 		else {
 			//rightFoot.MoveRotation(StateMachine_Twick.orientation);
 			rightFoot.rotation.Set(StateMachine_Twick.orientation.x,StateMachine_Twick.orientation.y,StateMachine_Twick.orientation.z,StateMachine_Twick.orientation.w);
+			drawFootImpulseLine(rightFoot.transform.position, rightFoot.transform.forward);
 			rightFoot.MovePosition (rightFoot.transform.position + rightFoot.transform.forward * Time.deltaTime);
 			//rightFoot.MoveRotation(new Quaternion(0, 0, 0, 1));
 			//rightFoot.MoveRotation(Quaternion.Euler(0,rightFoot.transform.rotation.eulerAngles.y,0));
 			return false;
 		}
 	}
-	
+
+	void drawFootImpulseLine(Vector3 start, Vector3 direction){
+		Debug.DrawRay (start, direction * 5, Color.magenta);
+	}
+
 	void printMatrix4x4(Matrix4x4 matrix){
 		string space = " "; 
 		print ("Printing Matrix:");

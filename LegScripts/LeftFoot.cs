@@ -144,10 +144,15 @@ public class LeftFoot : MonoBehaviour {
 			print ("Rotation = " + StateMachine_Twick.orientation);
 			//leftFoot.MoveRotation(StateMachine_Twick.orientation);
 			leftFoot.rotation.Set(StateMachine_Twick.orientation.x,StateMachine_Twick.orientation.y,StateMachine_Twick.orientation.z,StateMachine_Twick.orientation.w);
+			drawFootImpulseLine(leftFoot.transform.position, leftFoot.transform.forward);
 			leftFoot.MovePosition (transform.position + transform.forward * Time.deltaTime);
 			//leftFoot.MoveRotation (Quaternion.Euler(0, hips.transform.rotation.eulerAngles.y,0));
 			return false;
 		}
+	}
+
+	void drawFootImpulseLine(Vector3 start, Vector3 direction){
+		Debug.DrawRay (start, direction * 5, Color.cyan);
 	}
 
 	void printMatrix4x4(Matrix4x4 matrix){

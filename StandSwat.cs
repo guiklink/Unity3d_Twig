@@ -103,7 +103,8 @@ public class StandSwat : MonoBehaviour {
 		}
 
 		if (StateMachine_Twick.state != WalkState.STAND)
-			midPoint = new Vector3 (midPoint.x, midPoint.y, (rightFoot.transform.position.z + leftFoot.transform.position.z) / 2);
+			//midPoint = new Vector3 (midPoint.x, midPoint.y, (rightFoot.transform.position.z + leftFoot.transform.position.z) / 2);
+			midPoint = (rightFoot.transform.position + leftFoot.transform.position) / 2;
 
 		standPID (midPoint.x, balancingHeight, midPoint.z);
 	}	
