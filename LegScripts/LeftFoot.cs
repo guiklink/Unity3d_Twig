@@ -71,7 +71,6 @@ public class LeftFoot : MonoBehaviour {
 		} else if (StateMachine_Twick.state == WalkState.CALCULATE_RIGHT_STEP || StateMachine_Twick.state == WalkState.RIGHT_STEP) {
 			leftFoot.transform.position.Set (lockPosition.x, leftFoot.position.y, lockPosition.z);
 			//leftFoot.MoveRotation (Quaternion.Euler(0, hips.transform.rotation.eulerAngles.y,0));
-			print ("Rotation = " + StateMachine_Twick.orientation);
 			leftFoot.MoveRotation(StateMachine_Twick.orientation);
 
 		} else if (StateMachine_Twick.state != WalkState.CALCULATE_RIGHT_STEP && StateMachine_Twick.state != WalkState.RIGHT_STEP && StateMachine_Twick.state != WalkState.STAND) {
@@ -83,7 +82,6 @@ public class LeftFoot : MonoBehaviour {
 			lockPosition = rightFoot.transform.position;
 			//leftFoot.MoveRotation (new Quaternion (0, 0, 0, 1));
 			//leftFoot.MoveRotation (Quaternion.Euler(0, hips.transform.rotation.eulerAngles.y,0));
-			print ("Rotation = " + StateMachine_Twick.orientation);
 			leftFoot.MoveRotation(StateMachine_Twick.orientation);
 			leftFoot.angularVelocity.Set(0, 0, 0);
 			leftFoot.velocity.Set(0,0,0);
@@ -141,9 +139,11 @@ public class LeftFoot : MonoBehaviour {
 		if (footInFootCoord.z > desiredPos.z)
 			return true;
 		else {
-			print ("Rotation = " + StateMachine_Twick.orientation);
 			//leftFoot.MoveRotation(StateMachine_Twick.orientation);
-			leftFoot.rotation.Set(StateMachine_Twick.orientation.x,StateMachine_Twick.orientation.y,StateMachine_Twick.orientation.z,StateMachine_Twick.orientation.w);
+			//leftFoot.rotation.Set(StateMachine_Twick.orientation.x,StateMachine_Twick.orientation.y,StateMachine_Twick.orientation.z,StateMachine_Twick.orientation.w);
+			leftFoot.rotation = StateMachine_Twick.orientation;
+			//print ("Global Rot = " + StateMachine_Twick.orientation.eulerAngles);
+			//print ("Left Foot Rot = " + leftFoot.transform.rotation.eulerAngles);
 			drawFootImpulseLine(leftFoot.transform.position, leftFoot.transform.forward);
 			leftFoot.MovePosition (transform.position + transform.forward * Time.deltaTime);
 			//leftFoot.MoveRotation (Quaternion.Euler(0, hips.transform.rotation.eulerAngles.y,0));

@@ -20,6 +20,7 @@ public class StandSwat : MonoBehaviour {
 	float standingPosition;
 	float balancingHeight;
 	Rigidbody rb;
+	float sideDistanceBetweenFeet;
 	//Vector3 midPointPrev;
 
 	GameObject leftFoot;
@@ -42,6 +43,9 @@ public class StandSwat : MonoBehaviour {
 		rightArm = GameObject.Find("/swat/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm");
 		leftArm = GameObject.Find("/swat/Hips/Spine/Spine1/Spine2/RightShoulder/LeftArm");
 		ragdoll = GameObject.Find("/swat");
+
+		sideDistanceBetweenFeet = Vector3.Distance (leftFoot.transform.position, rightFoot.transform.position);
+		print ("Distance between feet = " + sideDistanceBetweenFeet);
 
 		InitPD ();
 	}
@@ -104,8 +108,9 @@ public class StandSwat : MonoBehaviour {
 
 		if (StateMachine_Twick.state != WalkState.STAND)
 			//midPoint = new Vector3 (midPoint.x, midPoint.y, (rightFoot.transform.position.z + leftFoot.transform.position.z) / 2);
-			midPoint = (rightFoot.transform.position + leftFoot.transform.position) / 2;
-
+			//midPoint = (rightFoot.transform.position + leftFoot.transform.position) / 2;
+			midPoint = calculateMidPoint ();
+		print (midPoint);
 		standPID (midPoint.x, balancingHeight, midPoint.z);
 	}	
 	
@@ -150,6 +155,45 @@ public class StandSwat : MonoBehaviour {
 		print ("Right foot: " + rightFoot.transform.position);
 		print ("Left foot: " + leftFoot.transform.position);
 	}
+
+	Vector3 calculateMidPoint(){
+		if (shouldRightLegStep()) {	// right leg is behind and will be used as frame
+			Vector3 leftFootInRightFootCoord = rightFoot.transform.worldToLocalMatrix.MultiplyPoint(leftFoot.transform.position);
+			Vector3 newMidPoint = new Vector3(sideDistanceBetweenFeet/2,0,(0 + leftFootInRightFootCoord.z) / 2);
+			newMidPoint = rightFoot.transform.localToWorldMatrix.MultiplyPoint(newMidPoint);
+			newMidPoint.y = midPoint.y;
+			return newMidPoint;
+		} else {					// left leg is behind and will be used as frame
+			Vector3 rightFootInLeftFootCoord = leftFoot.transform.worldToLocalMatrix.MultiplyPoint(rightFoot.transform.position);
+			Vector3 newMidPoint = new Vector3(sideDistanceBetweenFeet/2,0,(0 + rightFootInLeftFootCoord.z) / 2);
+			newMidPoint = leftFoot.transform.localToWorldMatrix.MultiplyPoint(newMidPoint);
+			newMidPoint.y = midPoint.y;
+			return newMidPoint;
+		}
+	}
+
+	/*Vector3 calculateMidPoint(){
+		float H = Vector3.Distance (leftFoot.transform.position, rightFoot.transform.position);
+		float h = H / 2;
+		float c = sideDistanceBetweenFeet / 2;
+
+		float a = Mathf.Sqrt (Mathf.Pow(h,2) - Mathf.Pow(c,2));
+
+		float x = rightFoot.transform.position.x + c;
+		float y = rightFoot.transform.position.y;
+		float z = rightFoot.transform.position.z + a;
+
+		return new Vector3(x,y,z);
+	}/*
+
+	/*Vector3 midPointUpdate(){
+		print ("Rot Y = " + StateMachine_Twick.orientation.eulerAngles.y + "\nCos Y = " + Mathf.Cos(StateMachine_Twick.orientation.eulerAngles.y) + "\nSin Y = " + Mathf.Sin(StateMachine_Twick.orientation.eulerAngles.y));
+		float x = ((rightFoot.transform.position.x + leftFoot.transform.position.x) / 2) * Mathf.Sin(StateMachine_Twick.orientation.eulerAngles.y);
+		float y = midPoint.y;
+		float z = ((rightFoot.transform.position.z + leftFoot.transform.position.z) / 2) * Mathf.Cos(StateMachine_Twick.orientation.eulerAngles.y);
+
+		return new Vector3 (x, y, z); // The y-axis should is not important, this is only used for allign the body in X and Z
+	}*/
 
 	/*void turnLeft(float speed){
 		bodyRotate (-1, speed);
